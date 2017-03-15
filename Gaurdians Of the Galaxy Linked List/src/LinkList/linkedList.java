@@ -174,6 +174,20 @@ public class linkedList {
     length--;
   }
 
+  public void deleteNode(doubleLinkedNode del)
+  {
+    doubleLinkedNode temp = head;
+    for(int i = 1; i <= length; i++)
+    {
+      if(temp.getSeat() == del.getSeat() && temp.getRow() == del.getRow())
+      {
+        deleteNode(i);
+	return;
+      }
+      temp = temp.getNext();
+    }
+  }
+
   //combine the previous two into one function for ease needed
   public doubleLinkedNode getDeleteNode(int place)
   {

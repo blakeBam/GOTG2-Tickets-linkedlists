@@ -113,9 +113,9 @@ public class Main {
         {
           //find the midpoint of the auditorium
           double[] midpoint = {(allDim[audi][0] + 1)/2.0, (allDim[audi][1] + 1)/2.0};
-          System.out.println(midpoint[0] + " " + midpoint[1]);
+          
+          //call a function to handle the best available seat
           bestAvailable(all[audi], input, midpoint, num);
-          //todo find the seats with the shortest distance to the midpoint
         }
       }
     }
@@ -254,28 +254,32 @@ public class Main {
   }
 
   //method for finding the best available seat in the auditorium
+  //may come back with a more efficent algorithm but works for now
   public static void bestAvailable(linkedList[] audi, Scanner input, double[] midpoint, int num)
   {
     doubleLinkedNode temp = audi[0].getHead(), cur, best = null;
-    int[] point = {0,0};
-    double distance = calcDistance(midpoint, point);
+    int[] leftPoint = {0,0}, rightPoint = {0,0};
+    double[] distance = {calcDistance(midpoint, leftPoint),calcDistance(midpoint, rightPoint)};
     while(temp != null)
     {
       boolean check = true;
       cur = temp;
       int row = cur.getRow();
-      for(int i = cur.getSeat(); i < num + cur.getSeat() && check; i++)
+      for(int i = temp.getSeat(); i < num + temp.getSeat() && check; i++)
       {
-        if(cur.getSeat() == i && cur != null && cur.getRow() == row) {cur = cur.getNext();}
+        if(cur != null && cur.getSeat() == i && cur.getRow() == row) {cur = cur.getNext();}
         else {check = false;}
       }
       if(check)
       {
-        point[0] = temp.getRow();
-	point[1] = temp.getSeat();
-        if(distance > calcDistance(midpoint, point))
+        leftPoint[0] = temp.getRow();
+	      leftPoint[1] = temp.getSeat();
+        rightPoint[0] = temp.getRow();
+        rightPoint[1] = temp.getSeat() + num - 1;
+        if(distance[0] + distance[1] > calcDistance(midpoint, leftPoint) + calcDistance(midpoint, rightPoint))
         {
-          distance = calcDistance(midpoint, point);
+          distance[0] = calcDistance(midpoint, leftPoint);
+          distance[1] = calcDistance(midpoint, rightPoint);
           best = temp;
         }
       }
@@ -284,8 +288,36 @@ public class Main {
 
     if(best != null)
     {
-      System.out.println("We have found a seat on row " + best.getRow() + " seat " + best.getSeat());
-      System.out.print("Would you like to reserve?(Y/N)");
+      System.out.print("We have found " + num);
+      if(num > 1)  {System.out.print(" open seats starting ");}
+      else {System.out.print(" open seat ");}
+      System.out.print("on row " + best.getRow() + " seat " + best.getSeat());
+      if(num > 1) {System.out.println(" and ending on seat " + (best.getSeat() + num - 1));}
+      else {System.out.println();}
+      System.out.print("Would you like to reserve?(Y/N): ");
+      while (!input.hasNext("[YN]"))
+      {
+        System.out.println("Error only enter Y for yes or N for no");
+        input.next();
+        System.out.println("Would you like to reserve?(Y/N): ");
+      }
+      String choice = input.next();
+
+      if(choice.equals("Y"))
+      {
+        for(int i = 0; i < num; i++)
+        {
+          temp = best.getNext();
+          audi[0].deleteNode(best);
+          audi[1].addNode(best);
+          best = temp;
+        }
+        System.out.println("Your seats have been reserved!");
+      }
+      else
+      {
+        System.out.println("I didn't want you to have them anyways");
+      }
     }
 
     else {System.out.println("No available seats were found in the auditorium");}
