@@ -165,10 +165,13 @@ public class linkedList {
     doubleLinkedNode temp = head;
     for(int i = 1; i < place; i++) {temp = temp.getNext();}
 
-    //if the node is not head set the previous nodes next as the current nodes next
-    if(temp.getPrev() != null) {(temp.getPrev()).setNext(temp.getNext());}
     //if the node is not tail set the next nodes previous as the current nodes previous
     if(temp.getNext() != null) {(temp.getNext()).setPrev(temp.getPrev());}
+    //if the node is not head set the previous nodes next as the current nodes next
+    if(temp.getPrev() != null) {(temp.getPrev()).setNext(temp.getNext());}
+    //replace our head and tail if necessary
+    if(temp.getNext() == null && temp.getPrev() != null) {tail = temp.getPrev();}
+    else if (temp.getNext() != null && temp.getPrev() == null) {head = temp.getNext();}
     //if we have just head set it to null
     if(temp.getNext() == null && temp.getPrev() == null) {head = null;}
     length--;

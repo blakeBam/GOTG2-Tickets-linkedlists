@@ -382,21 +382,28 @@ public class Main {
     return Math.sqrt(Math.pow((midpoint[0] - point[0]),2) + Math.pow((midpoint[1] - point[1]),2));
   }
 
+  //recursive print function
   public static void recursiveWrite(PrintWriter output, doubleLinkedNode open, doubleLinkedNode reserved)
   {
+    //our test case for when we reach the end of the lists
     if(open == null && reserved == null) {return;}
+    //check if the open is null and write the prevoius seat back
     else if(open == null)
     {
       recursiveWrite(output, open, reserved.getPrev());
+      //depending on if a new line is needed insert it
       if(reserved.getSeat() == 1 && reserved.getRow() != 1) {output.println();}
       output.print('.');
     }
+    //same but for the reserved being null
     else if(reserved == null)
     {
       recursiveWrite(output, open.getPrev(), reserved);
       if(open.getSeat() == 1 && open.getRow() != 1) {output.println();}
       output.print('#');
     }
+    //check if the rows are different so one will surely go before the other
+    //similar logic as before
     else if(open.getRow() < reserved.getRow())
     {
       recursiveWrite(output, open, reserved.getPrev());
@@ -409,6 +416,7 @@ public class Main {
       if(open.getSeat() == 1) {output.println();}
       output.print("#");
     }
+    //for the last two know they both are on the same row so only difference of seat metters
     else if(open.getSeat() < reserved.getSeat())
     {
       recursiveWrite(output, open, reserved.getPrev());
