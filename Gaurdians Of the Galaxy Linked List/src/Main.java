@@ -137,6 +137,15 @@ public class Main {
     System.out.print("Totals:          ");
     System.out.printf(" %-12d%-11d$%-12d\n", totals[1], totals[0], totals[1] * 7);
 
+    PrintWriter output = new PrintWriter(A1file);
+    recursiveWrite(output, all[0][0].getTail(), all[0][1].getTail());
+    output.close();
+    output = new PrintWriter(A2file);
+    recursiveWrite(output, all[1][0].getTail(), all[1][1].getTail());
+    output.close();
+    output = new PrintWriter(A3file);
+    recursiveWrite(output, all[2][0].getTail(), all[2][1].getTail());
+    output.close();
 
     //todo add print back to the files
   }
@@ -371,6 +380,45 @@ public class Main {
   public static double calcDistance(double[] midpoint, int[] point)
   {
     return Math.sqrt(Math.pow((midpoint[0] - point[0]),2) + Math.pow((midpoint[1] - point[1]),2));
+  }
+
+  public static void recursiveWrite(PrintWriter output, doubleLinkedNode open, doubleLinkedNode reserved)
+  {
+    if(open == null && reserved == null) {return;}
+    else if(open == null)
+    {
+      recursiveWrite(output, open, reserved.getPrev());
+      if(reserved.getSeat() == 1 && reserved.getRow() != 1) {output.println();}
+      output.print('.');
+    }
+    else if(reserved == null)
+    {
+      recursiveWrite(output, open.getPrev(), reserved);
+      if(open.getSeat() == 1 && open.getRow() != 1) {output.println();}
+      output.print('#');
+    }
+    else if(open.getRow() < reserved.getRow())
+    {
+      recursiveWrite(output, open, reserved.getPrev());
+      if(reserved.getSeat() == 1) {output.println();}
+      output.print(".");
+    }
+    else if(open.getRow() > reserved.getRow())
+    {
+      recursiveWrite(output, open.getPrev(), reserved);
+      if(open.getSeat() == 1) {output.println();}
+      output.print("#");
+    }
+    else if(open.getSeat() < reserved.getSeat())
+    {
+      recursiveWrite(output, open, reserved.getPrev());
+      output.print('.');
+    }
+    else
+    {
+      recursiveWrite(output, open.getPrev(), reserved);
+      output.print('#');
+    }
   }
 
   //method for printing the auditorium onto the screen for the user
