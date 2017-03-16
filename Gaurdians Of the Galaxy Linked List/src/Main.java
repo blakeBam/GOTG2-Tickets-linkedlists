@@ -119,7 +119,26 @@ public class Main {
       }
     }
 
-    //todo add final display and print back to the files
+    //array to hold the totals
+    int[] totals = new int[2];
+    for(int i = 0; i < totals.length; i++)
+    {
+      totals[i] = all[0][i].length() + all[1][i].length() + all[2][i].length();
+    }
+    //neatly display the final report back to the user
+    //shows them the number of reserved and open seats as well as the sales for each
+    //auditorium and a final row that has the totals of each column
+    System.out.println("   Labels      Reserved      Open        Sales");
+    for(int i = 0; i < all.length; i++)
+    {
+      System.out.print("Auditorium " + (i + 1) + ":    ");
+      System.out.printf(" %-12d%-11d$%-12d\n", all[i][1].length(), all[i][0].length(), all[i][1].length() * 7);
+    }
+    System.out.print("Totals:          ");
+    System.out.printf(" %-12d%-11d$%-12d\n", totals[1], totals[0], totals[1] * 7);
+
+
+    //todo add print back to the files
   }
 
   //method for reading in the auditorium from the file and storing into the lists
