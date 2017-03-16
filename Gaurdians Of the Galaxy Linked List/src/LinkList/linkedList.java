@@ -174,15 +174,17 @@ public class linkedList {
     length--;
   }
 
+  //method for deleting a node by passing in a node
   public void deleteNode(doubleLinkedNode del)
   {
     doubleLinkedNode temp = head;
+    //attempt to find the node in the list then call the delete method at the right place
     for(int i = 1; i <= length; i++)
     {
       if(temp.getSeat() == del.getSeat() && temp.getRow() == del.getRow())
       {
         deleteNode(i);
-	return;
+	      return;
       }
       temp = temp.getNext();
     }
