@@ -8,47 +8,27 @@ import java.io.*;
 
 public class Main {
   public static void main(String[] args) throws FileNotFoundException{
-    //create all the file objects
-    File A1file = new File("A1.txt");
-    File A2file = new File("A2.txt");
-    File A3file = new File("A3.txt");
+    //create a constant int to make the program modular for differing number of auditoriums
+    final int numFiles = 3;
+    File[] files = new File[numFiles];
+    for(int i = 1; i <= numFiles; i++) {files[i - 1] = new File("A" + i + ".txt");}
 
     //the legendary universal scanner
     Scanner input;
 
-    //intialize the linked list into an array so the open and reserved can be easily accessed
-    linkedList[] A1 = {new linkedList(), new linkedList()};
-    //also keep track of the number of rows and seats in each row in an array
-    int[] A1dim = new int[2];
-    //good habits
-    if(A1file.exists())
+    //create and array to hold all of the linked lists and pair two of them per auditorium
+    linkedList[][] all = new linkedList[numFiles][2];
+    int[][] allDim = new int[numFiles][2];
+    //loop through each file and store it in the approptiate array
+    for(int i = 0; i < numFiles && files[i].exists(); i++)
     {
-      input = new Scanner(A1file);
-      //read in the text file and store the appropriate lists
-      setLists(A1, A1dim, input);
+      input = new Scanner(files[i]);
+      all[i][0] = new linkedList();
+      all[i][1] = new linkedList();
+      setLists(all[i], allDim[i], input);
     }
 
-    //same as before
-    linkedList[] A2 = {new linkedList(), new linkedList()};
-    int[] A2dim = new int[2];
-    if(A2file.exists())
-    {
-      input = new Scanner(A2file);
-      setLists(A2, A2dim, input);
-    }
-
-    //same as before
-    linkedList[] A3 = {new linkedList(), new linkedList()};
-    int[] A3dim = new int[2];
-    if(A3file.exists())
-    {
-      input = new Scanner(A3file);
-      setLists(A3, A3dim, input);
-    }
-
-    //store everything in an array for ease of use in the menu
-    linkedList[][] all = {A1, A2, A3};
-    int[][] allDim = {A1dim, A2dim, A3dim};
+    //intialize the choices for the user
     int choice = 0, audi = 0, row = 0, seat = 0, num = 0;
     input = new Scanner(System.in);
 
@@ -77,7 +57,7 @@ public class Main {
       }
 
       //prompt the user for their choice of auditorium and display it
-      if(choice != 3) {audi = validateAudi(all, allDim, input);}
+      if(choice != 3) {audi = validateAudi(all, allDim, input, numFiles);}
 
       if(choice == 1)
       {
@@ -106,7 +86,7 @@ public class Main {
         check = checkAvailable(row, seat, num, all[audi]);
 
         //display a confirmation message if they are
-        if(check) {System.out.println("You're seats are available and have been reserved");}
+        if(check) {System.out.println("You're seats are available and have been reserved!\n");}
 
         //attempt to find the best available seats in the auditorium
         else
@@ -123,13 +103,14 @@ public class Main {
     int[] totals = new int[2];
     for(int i = 0; i < totals.length; i++)
     {
-      totals[i] = all[0][i].length() + all[1][i].length() + all[2][i].length();
+      for(int j = 0; j < numFiles; j++) {totals[i] += all[j][i].length();}
     }
+    
     //neatly display the final report back to the user
     //shows them the number of reserved and open seats as well as the sales for each
     //auditorium and a final row that has the totals of each column
     System.out.println("   Labels      Reserved      Open        Sales");
-    for(int i = 0; i < all.length; i++)
+    for(int i = 0; i < numFiles; i++)
     {
       System.out.print("Auditorium " + (i + 1) + ":    ");
       System.out.printf(" %-12d%-11d$%-12d\n", all[i][1].length(), all[i][0].length(), all[i][1].length() * 7);
@@ -137,17 +118,15 @@ public class Main {
     System.out.print("Totals:          ");
     System.out.printf(" %-12d%-11d$%-12d\n", totals[1], totals[0], totals[1] * 7);
 
-    PrintWriter output = new PrintWriter(A1file);
-    recursiveWrite(output, all[0][0].getTail(), all[0][1].getTail());
-    output.close();
-    output = new PrintWriter(A2file);
-    recursiveWrite(output, all[1][0].getTail(), all[1][1].getTail());
-    output.close();
-    output = new PrintWriter(A3file);
-    recursiveWrite(output, all[2][0].getTail(), all[2][1].getTail());
-    output.close();
-
-    //todo add print back to the files
+    //time for writing back to the file
+    PrintWriter output;
+    for(int i = 0; i < numFiles; i++)
+    {
+      //call a recursive print function and write all the data back to the files
+      output = new PrintWriter(files[i]);
+      recursiveWrite(output, all[i][0].getTail(), all[i][1].getTail());
+      output.close();
+    }
   }
 
   //method for reading in the auditorium from the file and storing into the lists
@@ -178,7 +157,7 @@ public class Main {
   }
 
   //method for validating the auditorium choice and displaying it to the user
-  public static int validateAudi(linkedList[][] all, int[][] allDim, Scanner input)
+  public static int validateAudi(linkedList[][] all, int[][] allDim, Scanner input, int numFiles)
   {
     //flag and loop to validate user input
     int choice = 0;
@@ -187,20 +166,21 @@ public class Main {
     {
       //display the submenu
       System.out.println("Select an auditorium:");
-      System.out.println("1. Auditorium 1");
-      System.out.println("2. Auditorium 2");
-      System.out.println("3. Auditorium 3");
+      for(int i = 1; i <= numFiles; i++)
+      {
+        System.out.println(i + ". Auditorium " + i);
+      }
 
       //make sure the input is within the appropriate range
       try
       {
         choice = input.nextInt();
-        if(choice < 1 || choice > 3) {throw new InputMismatchException();}
+        if(choice < 1 || choice > numFiles) {throw new InputMismatchException();}
         check = true;
       }
       catch(InputMismatchException e)
       {
-        System.out.println("Error only enter an integer from 1 to 3\n");
+        System.out.println("Error only enter an integer from 1 to " + numFiles + "\n");
         input.nextLine();
       }
     }
